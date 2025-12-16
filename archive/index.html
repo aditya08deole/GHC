@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvaraTech | Advanced IoT Water Management System</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #7c89d5;
+            --primary-dark: #5f6fe0;
+            --primary-light: #9aa7ff;
+            --accent: #6fe8ff;
+            --success: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            
+            --bg-body: #f0f9ff;
+            --bg-card: #ffffff;
+            --bg-card-light: #f8fafc;
+            --bg-glass: rgba(255, 255, 255, 0.95);
+            
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            
+            --shadow-glow: 0 0 20px rgba(14, 165, 233, 0.2);
+            --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --border-color: #e2e8f0;
+            --radius-lg: 20px;
+            --radius-xl: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to top right, #7c89d5, #f599a5);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(14, 165, 233, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1400px;
+            background: #f6f6fc;
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        .brand-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .hud-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hud-pill {
+            background: var(--bg-card);
+            padding: 0.875rem 1.5rem;
+            border-radius: 16px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            min-width: 160px;
+        }
+
+        .hud-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            border-color: var(--primary);
+        }
+
+        .hud-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .hud-icon {
+            color: var(--primary);
+            width: 22px;
+            height: 22px;
+        }
+
+        .hud-content {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .hud-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hud-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-analytics {
+            background: linear-gradient(135deg, var(--accent), #d97706);
+            color: white;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+            font-size: 0.95rem;
+        }
+
+        .btn-analytics:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+        }
+
+        /* MAIN GRID */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .card h2 {
+            font-size: 1.125rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card h2::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-dark));
+            border-radius: 2px;
+        }
+
+        /* VISUALIZATION ZONE */
+        .visual-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+            min-height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            overflow: visible;
+            position: relative;
+        }
+
+        .visual-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(14, 165, 233, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .svg-scene {
+            width: 100%;
+            max-width: 700px;
+            height: auto;
+        }
+
+        .svg-scene image.motor-img {
+            pointer-events: none;
+            filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12));
+        }
+
+        /* Motor image remains static when running (no rotation/animation) */
+        .motor-running image.motor-img {
+            transform-origin: center;
+        }
+
+        /* Motor aligner panel */
+        .aligner-toggle {
+            position: fixed;
+            right: 12px;
+            bottom: 12px;
+            z-index: 2000;
+            background: var(--primary);
+            color: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            font-weight:700;
+        }
+
+        .aligner-panel {
+            position: fixed;
+            right: 12px;
+            bottom: 56px;
+            width: 260px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+            padding: 12px;
+            z-index: 2000;
+            display: none;
+            font-size: 13px;
+        }
+
+        .aligner-panel label { display:block; margin-top:8px; color:var(--text-muted); }
+        .aligner-panel input[type=range]{ width:100%; }
+
+        /* round pipe ends */
+        .svg-scene path { stroke-linecap: round; }
+
+        /* WATER ANIMATION */
+
+        #water-fill {
+            pointer-events: none;
+            transition: height 220ms linear, y 220ms linear;
+        }
+
+        /* layered wave motion */
+        .water-wave { transform-origin: left center; }
+        .wave1 { animation: waveMove 6s linear infinite; }
+        .wave2 { animation: waveMoveReverse 10s linear infinite; }
+
+        @keyframes waveMove { 0%{ transform: translateX(0);} 100%{ transform: translateX(-60px);} }
+        @keyframes waveMoveReverse { 0%{ transform: translateX(0);} 100%{ transform: translateX(60px);} }
+
+        /* MOTOR ANIMATION */
+        /* motor blades removed - using static motor image instead */
+
+        /* PIPE FLOW */
+        .pipe-flow {
+            stroke-dasharray: 12 12;
+            stroke-dashoffset: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pipe-flow.active {
+            opacity: 1;
+            animation: flowAnimation 2s linear infinite;
+        }
+
+        /* when motor is running, make the main pipe appear filled with water */
+        .pipe-active { stroke: #60d3ff !important; transition: stroke 300ms ease, filter 300ms ease; filter: drop-shadow(0 6px 18px rgba(96,211,255,0.18)); }
+
+        /* droplets that fall into the tank */
+        .droplet { fill: #60d3ff; opacity: 0.95; }
+
+        @keyframes flowAnimation {
+            /* move dashes along the path direction (motor -> tank) */
+            100% { stroke-dashoffset: 30; }
+        }
+
+        /* WINDOW LIGHTS */
+        .window {
+            fill: #cbd5e1;
+            transition: all 0.5s ease;
+        }
+
+        .window.lit {
+            fill: #fbbf24;
+            filter: drop-shadow(0 0 8px #fbbf24);
+        }
+
+        /* SENSOR PULSE */
+        .sensor-indicator {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        /* CONTROLS */
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .motor-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn-ctrl {
+            padding: 1.25rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 700;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .btn-on {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid var(--success);
+            color: var(--success);
+        }
+
+        .btn-on:hover, .btn-on.active {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-off {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+        }
+
+        .btn-off:hover, .btn-off.active {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Small styles for ON/OFF buttons */
+        .btn-ctrl { text-transform: uppercase; letter-spacing: 0.12em; }
+        .btn-on { min-width: 100px; }
+        .btn-off { min-width: 100px; }
+
+    /* Active ON/OFF visual states */
+    .btn-on.active, .btn-on:hover { background: var(--success); color: white; box-shadow: 0 6px 18px rgba(16,185,129,0.25); }
+    .btn-off.active, .btn-off:hover { background: var(--danger); color: white; box-shadow: 0 6px 18px rgba(239,68,68,0.25); }
+
+    /* Motor glow when running */
+    .motor-running circle { filter: drop-shadow(0 6px 18px rgba(14,165,233,0.25)); }
+        .motor-running { transition: transform 0.25s ease; transform-origin: center; }
+        .motor-running:hover { transform: scale(1.02); }
+
+        /* STATUS INFO */
+        .info-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: var(--bg-card-light);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .info-key {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .info-val {
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .status-badge {
+            padding: 0.375rem 0.875rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-idle {
+            background: rgba(100, 116, 139, 0.15);
+            color: var(--text-muted);
+        }
+
+        .status-active {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        /* SYSTEM STATUS */
+        .system-status {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(14, 165, 233, 0.08));
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Focus styles for keyboard users */
+        :focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 3px;
+        }
+
+        /* Respect user motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .water-wave, .pipe-flow.active {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-container {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .hud-group {
+                width: 100%;
+            }
+            .hud-pill {
+                flex: 1;
+                min-width: 140px;
+            }
+            .motor-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ALERT STYLES */
+        .alert {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="dashboard-container">
+        
+        <header>
+            <div class="logo-section">
+                <div class="logo">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>EvaraTech</h1>
+                    <p>IoT Water Management</p>
+                </div>
+            </div>
+
+            <div class="hud-group">
+                <div class="hud-pill">
+                    <div class="hud-icon-wrapper">
+                        <svg class="hud-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                        </svg>
+                    </div>
+                    <div class="hud-content">
+                        <span class="hud-label">Water Level</span>
+                        <span class="hud-value" id="hud-level">0%</span>
+                    </div>
+                </div>
+
+                <div class="hud-pill">
+                    <div class="hud-icon-wrapper">
+                        <svg class="hud-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                        <div class="hud-content">
+                            <span class="hud-label">Temperature</span>
+                            <span class="hud-value" id="hud-temp">26°C</span>
+                        </div>
+                </div>
+            </div>
+
+            <button id="btn-analytics" type="button" class="btn btn-analytics">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                Analytics
+            </button>
+        </header>
+
+        <section class="main-grid">
+            
+            <article class="card visual-card">
+                <svg class="svg-scene" viewBox="0 0 600 600" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <linearGradient id="waterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#38bdf8;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0284c7;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="tankGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#e2e8f0;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#cbd5e1;stop-opacity:1" />
+                        </linearGradient>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+
+                    <!-- Building -->
+                    <g id="building">
+                        <rect x="40" y="290" width="260" height="320" fill="#e2e8f0" stroke="#94a3b8" stroke-width="3" rx="8"/>
+                        
+                        <!-- Windows (3x3 grid) -->
+                        <rect class="window" x="70" y="315" width="45" height="45" rx="4"/>
+                        <rect class="window" x="126" y="315" width="45" height="45" rx="4"/>
+                        <rect class="window" x="182" y="315" width="45" height="45" rx="4"/>
+                        
+                        <rect class="window" x="70" y="385" width="45" height="45" rx="4"/>
+                        <rect class="window" x="126" y="385" width="45" height="45" rx="4"/>
+                        <rect class="window" x="182" y="385" width="45" height="45" rx="4"/>
+                        
+                        <rect class="window" x="70" y="455" width="45" height="45" rx="4"/>
+                        <rect class="window" x="126" y="455" width="45" height="45" rx="4"/>
+                        <rect class="window" x="182" y="455" width="45" height="45" rx="4"/>
+                        
+                        <!-- Door -->
+                        <rect x="150" y="545" width="70" height="80" fill="#cbd5e1" rx="4"/>
+                        <circle cx="200" cy="585" r="3" fill="#94a3b8"/>
+                    </g>
+
+                    <!-- Tank Assembly -->
+                    <g id="tank" transform="translate(100, 80)">
+                        <!-- Tank Body (smaller) -->
+                        <rect x="0" y="0" width="140" height="200" fill="url(#tankGrad)" stroke="#94a3b8" stroke-width="3" rx="6"/>
+                        
+                        <!-- Water Level Markers -->
+                        <line x1="10" y1="45" x2="130" y2="45" stroke="#94a3b8" stroke-dasharray="5,5" opacity="0.5"/>
+                        <line x1="10" y1="95" x2="130" y2="95" stroke="#94a3b8" stroke-dasharray="5,5" opacity="0.5"/>
+                        <line x1="10" y1="145" x2="130" y2="145" stroke="#94a3b8" stroke-dasharray="5,5" opacity="0.5"/>
+                        
+                        <!-- Water Fill -->
+                        <rect id="water-fill" x="5" y="195" width="130" height="0" fill="url(#waterGrad)" opacity="0.95"/>
+                        
+                        <!-- Water Surface Waves: layered shapes for a liquid look -->
+                        <g id="wave1-wrap" transform="translate(0,195)">
+                            <path id="wave1" class="water-wave wave1" d="M5 0 Q45 -6, 80 0 T125 0 L125 20 L5 20 Z" fill="#7dd3fc" opacity="0.95"></path>
+                        </g>
+                        <g id="wave2-wrap" transform="translate(0,195)">
+                            <path id="wave2" class="water-wave wave2" d="M5 2 Q45 -4, 80 2 T125 2 L125 18 L5 18 Z" fill="#60d3ff" opacity="0.7"></path>
+                        </g>
+                        
+                        <!-- Sensor at Top -->
+                        <g transform="translate(70, -5)">
+                            <rect x="-10" y="-15" width="20" height="20" fill="#94a3b8" rx="3"/>
+                            <circle cx="0" cy="-5" r="5" fill="#38bdf8" class="sensor-indicator"/>
+                            <path d="M-8 5 Q0 10, 8 5" stroke="#38bdf8" stroke-width="1.5" fill="none" opacity="0.6"/>
+                            <path d="M-12 10 Q0 17, 12 10" stroke="#38bdf8" stroke-width="1" fill="none" opacity="0.4"/>
+                        </g>
+                        
+                        <!-- WiFi Module on Side -->
+                        <g transform="translate(-25, 80)">
+                            <rect x="0" y="0" width="22" height="35" fill="#0EA5E9" rx="3"/>
+                            <line x1="6" y1="12" x2="6" y2="23" stroke="white" stroke-width="2"/>
+                            <circle cx="12" cy="17" r="3" fill="white" class="sensor-indicator"/>
+                        </g>
+                    </g>
+
+              <!-- Pipe System -->
+              <!-- Pipe from tank (left) to motor (right) - drawn left->right but flow will animate right->left visually -->
+              <path id="base-pipe" d="M 420 420 L 300 420 L 300 200 L 240 200"
+                  fill="none" stroke="#9fbfe6" stroke-width="14" stroke-linejoin="round"/>
+                    
+              <!-- Animated Flow (dashes) -->
+              <path class="pipe-flow" id="flow-line"
+                  d="M 420 420 L 300 420 L 300 200 L 240 200"
+                  fill="none" stroke="#38bdf8" stroke-width="8" filter="url(#glow)"/>
+
+                    <!-- droplets group (animated) -> positioned near tank mouth -->
+                    <g id="droplets"></g>
+
+                    <!-- Motor/Pump Assembly -->
+                            <g id="motor" transform="translate(420, 420)">
+                                <!-- Motor image (PNG) - single source of truth for motor appearance -->
+                                <image href="motor.png" x="-32" y="-100" width="174" height="174" preserveAspectRatio="xMidYMid meet" class="motor-img"/>
+                                <!-- Fallback simple motor silhouette if PNG missing -->
+                                <g id="motor-fallback" style="display:none;" transform="translate(0,0)">
+                                    <rect x="-28" y="-18" width="56" height="36" rx="6" fill="#0ea5e9"/>
+                                    <rect x="-8" y="-26" width="16" height="8" rx="3" fill="#94a3b8"/>
+                                    <rect x="-12" y="10" width="24" height="6" rx="3" fill="#475569"/>
+                                </g>
+                            </g>
+                </svg>
+            </article>
+
+            <aside class="control-panel">
+                
+                <div class="card">
+                    <h2>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+                        </svg>
+                        Manual Controller
+                    </h2>
+                    <p style="color:var(--text-muted); margin-bottom:1.25rem; font-size:0.875rem; line-height:1.5;">
+                        Override automatic water management settings and control the pump manually from this panel.
+                    </p>
+                    
+                    <div class="motor-controls">
+                        <button class="btn btn-ctrl btn-on" id="btn-on" type="button" aria-pressed="false">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            ON
+                        </button>
+                        <button class="btn btn-ctrl btn-off" id="btn-off" type="button" aria-pressed="false">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"/>
+                            </svg>
+                            OFF
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        System Status
+                    </h2>
+                    <ul class="info-list">
+                        <li class="info-item">
+                            <span class="info-key">Motor State</span>
+                            <span class="status-badge status-idle" id="status-motor">Idle</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-key">Water Level</span>
+                            <span class="info-val" id="status-level">0%</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-key">Flow Rate</span>
+                            <span class="info-val" id="flow-rate">0 L/min</span>
+                        </li>
+                        <li class="info-item">
+                            <span class="info-key">Tank Capacity</span>
+                            <span class="info-val">1000 L</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="system-status" role="status" aria-live="polite">
+                    <div class="status-dot"></div>
+                    <span class="status-text">System Online · All Sensors Active</span>
+                </div>
+
+            </aside>
+        </section>
+
+    </main>
+        <!-- Analytics view (hidden by default) -->
+        <section id="analytics-view" style="display:none; padding:2rem; max-width:1400px; margin:0 auto;">
+            <div style="background:#fff; border-radius:12px; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,0.08)">
+                <header style="display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                        <h1 style="margin:0; font-size:20px">EvaraTech Analytics</h1>
+                        <div style="color:var(--text-muted);font-size:13px">Water metrics, ThingSpeak charts and device telemetry</div>
+                    </div>
+                    <div>
+                        <button id="analytics-back" type="button" class="btn" style="background:transparent;color:var(--primary);font-weight:700">← Back</button>
+                    </div>
+                </header>
+
+                <section style="display:grid; grid-template-columns:2fr 1fr; gap:18px; margin-top:18px">
+                    <div>
+                        <div style="background:var(--bg-card); padding:14px; border-radius:10px; box-shadow:0 6px 18px rgba(15,23,42,0.06)">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                                <strong>Current Water</strong>
+                                <small style="color:var(--text-muted)">in KL</small>
+                            </div>
+                            <div style="display:flex; gap:12px">
+                                <div style="flex:1; padding:12px; border-radius:8px; background:linear-gradient(180deg,#fff,#f7fbff); text-align:center">
+                                    <h3 id="water-kl">0.00 KL</h3>
+                                    <p style="margin:6px 0 0; color:var(--text-muted)">Tank Level</p>
+                                </div>
+                                <div style="flex:1; padding:12px; border-radius:8px; background:linear-gradient(180deg,#fff,#f7fbff); text-align:center">
+                                    <h3 id="flow-kl">0 L/min</h3>
+                                    <p style="margin:6px 0 0; color:var(--text-muted)">Flow Rate</p>
+                                </div>
+                                <div style="flex:1; padding:12px; border-radius:8px; background:linear-gradient(180deg,#fff,#f7fbff); text-align:center">
+                                    <h3 id="pump-time">0h</h3>
+                                    <p style="margin:6px 0 0; color:var(--text-muted)">Pump Running Time</p>
+                                </div>
+                            </div>
+
+                            <div style="margin-top:14px">
+                                <div style="font-weight:700;margin-bottom:8px">Water Level (ThingSpeak)</div>
+                                <div style="height:220px; border-radius:8px; background:linear-gradient(90deg,#eef6ff,#fff); display:flex; align-items:center; justify-content:center">
+                                    <!-- ThingSpeak iframe example: replace CHANNEL_ID -->
+                                    <iframe src="https://thingspeak.com/channels/CHANNEL_ID/charts/1?bgcolor=%23ffffff&color=%2383c2ff&dynamic=true&results=60&type=line&width=600" style="border:0;width:100%;height:220px;border-radius:8px"></iframe>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:var(--bg-card); padding:14px; border-radius:10px; margin-top:14px"> 
+                            <div style="font-weight:700;margin-bottom:8px">Device Uptime & Battery</div>
+                            <div style="height:120px; border-radius:8px; background:linear-gradient(90deg,#fff,#f7fbff); display:flex;align-items:center;justify-content:center">Battery, Online/Offline, Last seen</div>
+                        </div>
+                    </div>
+
+                    <aside>
+                        <div style="background:var(--bg-card); padding:14px; border-radius:10px">
+                            <strong>Device Summary</strong>
+                            <div style="margin-top:12px;color:var(--text-muted)">Device ID: <span id="device-id">--</span></div>
+                            <div style="margin-top:8px;color:var(--text-muted)">Status: <span id="device-status">Offline</span></div>
+                            <a href="#" style="display:inline-block;margin-top:8px;color:var(--primary)">Export CSV</a>
+                        </div>
+
+                        <div style="background:var(--bg-card); padding:14px; border-radius:10px; margin-top:14px">
+                            <strong>Company Data</strong>
+                            <p style="color:var(--text-muted);font-size:13px;margin-top:8px">Summary of usage and billing data</p>
+                        </div>
+                    </aside>
+                </section>
+            </div>
+        </section>
+
+        <script>
+        const state = {
+            motorRunning: false,
+            waterLevel: 0,
+            temperature: 26,
+            maxLevel: 100,
+            fillRate: 0.6
+        };
+
+        let fillInterval = null;
+        let fillRequestId = null;
+        let lastFillTimestamp = null;
+        // fillRate now represents percent per second (converted from previous value)
+        // we interpret state.fillRate as percent-per-second (0.6 => 0.6% per tick before)
+        const getFillRatePerSecond = () => state.fillRate; 
+
+        function startFillLoop() {
+            if (fillRequestId) return;
+            lastFillTimestamp = performance.now();
+            function step(ts) {
+                const dt = (ts - lastFillTimestamp) / 1000; // seconds
+                lastFillTimestamp = ts;
+                const deltaPercent = getFillRatePerSecond() * dt; // percent
+                if (state.waterLevel < state.maxLevel) {
+                    state.waterLevel = Math.min(state.maxLevel, state.waterLevel + deltaPercent);
+                    updateVisuals();
+                    fillRequestId = requestAnimationFrame(step);
+                } else {
+                    state.waterLevel = state.maxLevel;
+                    updateVisuals();
+                    toggleMotor(false);
+                    showAlert('Tank Full! Motor stopped automatically.');
+                }
+            }
+            fillRequestId = requestAnimationFrame(step);
+        }
+
+        function stopFillLoop() {
+            if (fillRequestId) {
+                cancelAnimationFrame(fillRequestId);
+                fillRequestId = null;
+            }
+            lastFillTimestamp = null;
+        }
+
+        function updateVisuals() {
+            const waterRect = document.getElementById('water-fill');
+            const wave1Wrap = document.getElementById('wave1-wrap');
+            const wave2Wrap = document.getElementById('wave2-wrap');
+            const hudLevel = document.getElementById('hud-level');
+            const hudTemp = document.getElementById('hud-temp');
+            const statusLevel = document.getElementById('status-level');
+            const flowRate = document.getElementById('flow-rate');
+            
+            const tankHeight = 200;
+            const waterHeight = (state.waterLevel / 100) * tankHeight;
+            const yPosition = tankHeight - waterHeight;
+            
+            // water-fill rect x/y based on tank markup (x=5, bottom at tankHeight)
+            waterRect.setAttribute('height', waterHeight);
+            waterRect.setAttribute('y', yPosition + 5);
+            
+            if (state.waterLevel > 0) {
+                if (wave1Wrap) wave1Wrap.setAttribute('transform', `translate(0, ${yPosition + 5})`);
+                if (wave2Wrap) wave2Wrap.setAttribute('transform', `translate(0, ${yPosition + 5})`);
+                if (wave1Wrap) wave1Wrap.style.opacity = Math.min(1, 0.3 + state.waterLevel/100 + (state.motorRunning ? 0.3:0));
+                if (wave2Wrap) wave2Wrap.style.opacity = Math.min(1, 0.2 + state.waterLevel/100 + (state.motorRunning ? 0.2:0));
+            } else {
+                if (wave1Wrap) wave1Wrap.style.opacity = '0';
+                if (wave2Wrap) wave2Wrap.style.opacity = '0';
+            }
+            
+            hudLevel.textContent = Math.round(state.waterLevel) + '%';
+            hudTemp.textContent = Math.round(state.temperature) + '°C';
+            statusLevel.textContent = Math.round(state.waterLevel) + '%';
+            flowRate.textContent = state.motorRunning ? '7 L/min' : '0 L/min';
+
+            // mirror to analytics view metrics if present
+            const aWater = document.getElementById('water-kl');
+            const aFlow = document.getElementById('flow-kl');
+            const aPumpTime = document.getElementById('pump-time');
+            if (aWater) aWater.textContent = (state.waterLevel / 100 * 1.0).toFixed(2) + ' KL';
+            if (aFlow) aFlow.textContent = state.motorRunning ? '7 L/min' : '0 L/min';
+            if (aPumpTime) {
+                // simplistic pump running time display (could be cumulative)
+                aPumpTime.textContent = state.motorRunning ? 'Running' : 'Idle';
+            }
+        }
+        // droplets handling
+        let droplets = [];
+        let dropletsRaf = null;
+        let dropletSpawnInterval = null;
+
+        function createDroplet(sx, sy){
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const g = document.getElementById('droplets');
+            if(!g) return null;
+            const c = document.createElementNS(svgNS, 'circle');
+            c.setAttribute('cx', sx);
+            c.setAttribute('cy', sy);
+            c.setAttribute('r', '4');
+            c.setAttribute('class', 'droplet');
+            g.appendChild(c);
+            const start = performance.now();
+            const life = 900 + Math.random()*400; // ms to fall
+            // compute targetY based on current state.waterLevel and tank position
+            // tank group is translated by (100,80) earlier; inside tank, water top is yPosition + 5
+            const tankGroupTranslateX = 100; const tankGroupTranslateY = 80;
+            const tankHeight = 200;
+            const waterHeight = (state.waterLevel / 100) * tankHeight;
+            const yPosition = tankHeight - waterHeight;
+            const tankTopY = tankGroupTranslateY + yPosition + 5; // absolute SVG y for water surface
+            droplets.push({ el: c, start, life, sy: Number(sy), tx: sx, ty: tankTopY });
+            return c;
+        }
+
+        function stepDroplets(ts){
+            for(let i = droplets.length -1; i>=0; i--){
+                const d = droplets[i];
+                const t = Math.min(1, (ts - d.start)/d.life);
+                // simple ease-in fall
+                const ease = t*t;
+                const newY = d.sy + (d.ty - d.sy) * ease;
+                d.el.setAttribute('cy', String(newY));
+                d.el.setAttribute('r', String(4 * (1 - 0.3*t))); // slight shrink
+                d.el.style.opacity = String(1 - 0.9*t);
+                if(t >= 1){
+                    // create a tiny splash at the target
+                    try{
+                        const svgNS = 'http://www.w3.org/2000/svg';
+                        const g = document.getElementById('droplets');
+                        if(g){
+                            const s = document.createElementNS(svgNS, 'circle');
+                            s.setAttribute('cx', String(d.tx));
+                            s.setAttribute('cy', String(d.ty));
+                            s.setAttribute('r', '1');
+                            s.setAttribute('fill', '#9fe8ff');
+                            s.style.opacity = '0.9';
+                            g.appendChild(s);
+                            // expand and fade
+                            const splashStart = performance.now();
+                            const splashDur = 350;
+                            const anim = (tS)=>{
+                                const tt = Math.min(1,(tS - splashStart)/splashDur);
+                                s.setAttribute('r', String(1 + 6*tt));
+                                s.style.opacity = String(1 - tt);
+                                if(tt < 1) requestAnimationFrame(anim); else if(s.parentNode) s.parentNode.removeChild(s);
+                            };
+                            requestAnimationFrame(anim);
+                        }
+                    }catch(e){}
+                    // remove droplet
+                    if(d.el.parentNode) d.el.parentNode.removeChild(d.el);
+                    droplets.splice(i,1);
+                }
+            }
+            if(droplets.length) dropletsRaf = requestAnimationFrame(stepDroplets);
+            else dropletsRaf = null;
+        }
+
+        function startDroplets(){
+            const basePipe = document.getElementById('base-pipe');
+            if(basePipe) basePipe.classList.add('pipe-active');
+            // spawn droplets near the pipe mouth into the tank (approx x=300,y=200 in SVG coords)
+            // spawn frequency scales with fillRate (faster fill -> more droplets)
+            const spawnMs = Math.max(80, 400 - (getFillRatePerSecond() * 200));
+            dropletSpawnInterval = setInterval(()=>{
+                // spawn near the motor (approx motor origin x=420,y=420) but with slight offset
+                const sx = 420 + (Math.random()*18 - 9);
+                const sy = 420 + (Math.random()*8 - 4);
+                createDroplet(sx, sy);
+                if(!dropletsRaf) dropletsRaf = requestAnimationFrame(stepDroplets);
+            }, spawnMs);
+        }
+
+        function stopDroplets(){
+            const basePipe = document.getElementById('base-pipe');
+            if(basePipe) basePipe.classList.remove('pipe-active');
+            if(dropletSpawnInterval){ clearInterval(dropletSpawnInterval); dropletSpawnInterval = null; }
+            if(dropletsRaf){ cancelAnimationFrame(dropletsRaf); dropletsRaf = null; }
+            // remove remaining droplets
+            const g = document.getElementById('droplets');
+            if(g) g.innerHTML = '';
+            droplets = [];
+        }
+        // lock/unlock motor editing and aligner panel while pump is running
+        function setMotorLocked(lock){
+            const alignToggle = document.getElementById('aligner-toggle');
+            const alignPanel = document.getElementById('aligner-panel');
+            const panelInputs = document.querySelectorAll('#aligner-panel input, #aligner-panel button');
+            const codeArea = document.getElementById('motor-code');
+            const status = document.getElementById('align-status');
+            if(lock){
+                if(alignToggle) alignToggle.disabled = true;
+                panelInputs.forEach(el=> el.disabled = true);
+                if(codeArea) codeArea.disabled = true;
+                if(status) { status.textContent = 'Motor locked while running'; status.style.color = '#065f46'; }
+            } else {
+                if(alignToggle) alignToggle.disabled = false;
+                panelInputs.forEach(el=> el.disabled = false);
+                if(codeArea) codeArea.disabled = false;
+                if(status) { status.textContent = ''; status.style.color = 'var(--text-muted)'; }
+            }
+        }
+        function toggleMotor(turnOn) {
+            // no-op if already in desired state
+            if (state.motorRunning === !!turnOn) return;
+
+            state.motorRunning = !!turnOn;
+
+            const motor = document.getElementById('motor');
+            const flowLine = document.getElementById('flow-line');
+            const statusMotor = document.getElementById('status-motor');
+            const btnOn = document.getElementById('btn-on');
+            const btnOff = document.getElementById('btn-off');
+            const windows = document.querySelectorAll('.window');
+
+            if (turnOn) {
+                motor.classList.add('motor-running');
+                flowLine.classList.add('active');
+                statusMotor.textContent = 'Running';
+                statusMotor.className = 'status-badge status-active';
+                btnOn.classList.add('active');
+                btnOff.classList.remove('active');
+                btnOn.setAttribute('aria-pressed', 'true');
+                btnOff.setAttribute('aria-pressed', 'false');
+                motor.setAttribute('aria-live', 'polite');
+
+                windows.forEach(w => w.classList.add('lit'));
+
+                // start rAF-based fill loop
+                startFillLoop();
+                // start droplets and pipe highlight
+                startDroplets();
+                // lock motor editing while pump is running
+                setMotorLocked(true);
+            } else {
+                motor.classList.remove('motor-running');
+                flowLine.classList.remove('active');
+                statusMotor.textContent = 'Idle';
+                statusMotor.className = 'status-badge status-idle';
+                btnOff.classList.add('active');
+                btnOn.classList.remove('active');
+                btnOn.setAttribute('aria-pressed', 'false');
+                btnOff.setAttribute('aria-pressed', 'true');
+                motor.removeAttribute('aria-live');
+
+                windows.forEach(w => w.classList.remove('lit'));
+
+                // stop rAF-based fill loop
+                stopFillLoop();
+                // stop droplets and pipe highlight
+                stopDroplets();
+                // unlock motor editing when pump is stopped
+                setMotorLocked(false);
+            }
+        }
+
+        function showAlert(message) {
+            const existing = document.querySelector('.alert');
+            if (existing) existing.remove();
+
+            const alert = document.createElement('div');
+            alert.className = 'alert';
+            alert.setAttribute('role', 'alert');
+            alert.setAttribute('aria-live', 'polite');
+
+            const wrapper = document.createElement('div');
+            wrapper.style.display = 'flex';
+            wrapper.style.alignItems = 'center';
+            wrapper.style.gap = '0.75rem';
+
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute('width', '24');
+            svg.setAttribute('height', '24');
+            svg.setAttribute('fill', 'none');
+            svg.setAttribute('stroke', 'currentColor');
+            svg.setAttribute('viewBox', '0 0 24 24');
+            svg.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+
+            const text = document.createElement('span');
+            text.style.fontWeight = '600';
+            text.style.color = 'var(--text-main)';
+            text.textContent = message; // safe
+
+            const btnClose = document.createElement('button');
+            btnClose.type = 'button';
+            btnClose.style.marginLeft = '8px';
+            btnClose.style.background = 'transparent';
+            btnClose.style.border = 'none';
+            btnClose.style.cursor = 'pointer';
+            btnClose.setAttribute('aria-label', 'Dismiss alert');
+            btnClose.textContent = '✕';
+            btnClose.addEventListener('click', () => { if (alert.parentNode) alert.parentNode.removeChild(alert); });
+
+            wrapper.appendChild(svg);
+            wrapper.appendChild(text);
+            wrapper.appendChild(btnClose);
+
+            alert.appendChild(wrapper);
+            document.body.appendChild(alert);
+
+            // focus for a11y, remove after timeout or on Escape
+            alert.tabIndex = -1;
+            alert.focus();
+
+            const remove = () => { if (alert.parentNode) alert.parentNode.removeChild(alert); };
+            const escHandler = (e) => { if (e.key === 'Escape') remove(); };
+            document.addEventListener('keydown', escHandler, { once: true });
+
+            setTimeout(() => {
+                remove();
+            }, 4000);
+        }
+
+        function showTemporaryNotice(message){
+            const existing = document.querySelector('.alert');
+            if(existing) existing.remove();
+            const notice = document.createElement('div');
+            notice.className = 'alert';
+            notice.style.borderLeftColor = 'var(--success)';
+            notice.setAttribute('role','status');
+            notice.textContent = message;
+            document.body.appendChild(notice);
+            setTimeout(()=>{ if(notice.parentNode) notice.parentNode.removeChild(notice); }, 2000);
+        }
+
+        // wire up event listeners after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('btn-on').addEventListener('click', () => toggleMotor(true));
+            document.getElementById('btn-off').addEventListener('click', () => toggleMotor(false));
+            document.getElementById('btn-analytics').addEventListener('click', () => {
+                // show analytics view embedded in this page
+                document.querySelector('main.dashboard-container').style.display = 'none';
+                document.getElementById('analytics-view').style.display = 'block';
+                // set focus for accessibility
+                document.getElementById('analytics-view').focus();
+            });
+
+            document.getElementById('analytics-back').addEventListener('click', () => {
+                document.getElementById('analytics-view').style.display = 'none';
+                document.querySelector('main.dashboard-container').style.display = '';
+            });
+
+            updateVisuals();
+            // ensure aligner numeric readouts reflect saved defaults
+            const updateAndApply = window.updateAndApply;
+            if(typeof updateAndApply === 'function') updateAndApply();
+        });
+
+        // temperature simulation
+        setInterval(() => {
+            state.temperature = 26 + Math.random() * 2 - 1;
+            updateVisuals();
+        }, 5000);
+    </script>
+
+    <!-- Motor aligner UI -->
+    <div class="aligner-toggle" id="aligner-toggle">Align Motor</div>
+    <div class="aligner-panel" id="aligner-panel">
+        <div style="font-weight:700">Motor Align</div>
+        <label for="motor-x">X</label>
+    <div style="display:flex;align-items:center;gap:8px"><input id="motor-x" type="range" min="-200" max="200" step="1"><span id="motor-x-val" style="min-width:44px;text-align:center;font-weight:700">-</span></div>
+        <label for="motor-y">Y</label>
+    <div style="display:flex;align-items:center;gap:8px"><input id="motor-y" type="range" min="-200" max="200" step="1"><span id="motor-y-val" style="min-width:44px;text-align:center;font-weight:700">-</span></div>
+        <label for="motor-w">Width</label>
+    <div style="display:flex;align-items:center;gap:8px"><input id="motor-w" type="range" min="30" max="200" step="1"><span id="motor-w-val" style="min-width:44px;text-align:center;font-weight:700">-</span></div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+            <button id="align-snap" class="btn" type="button">Snap to Pipe</button>
+            <button id="align-save" class="btn" type="button">Save</button>
+            <button id="align-reset" class="btn" type="button">Reset</button>
+        </div>
+            <div style="margin-top:10px; font-size:13px; color:var(--text-muted)">
+                <div style="margin-bottom:6px; font-weight:600">Code preview</div>
+                <textarea id="motor-code" rows="3" style="background:#f6f7fb;padding:8px;border-radius:6px;border:1px solid #e6e9f2;overflow:auto;white-space:pre-wrap;font-size:12px;resize:vertical"></textarea>
+                <div style="display:flex; gap:8px; margin-top:6px;">
+                    <button id="copy-code" class="btn" type="button">Copy code</button>
+                    <button id="apply-code" class="btn" type="button">Apply coordinates</button>
+                </div>
+                    <div id="align-status" style="margin-top:8px;font-size:12px;color:var(--text-muted)"></div>
+            </div>
+    </div>
+
+    <script>
+        (function(){
+            const toggle = document.getElementById('aligner-toggle');
+            const panel = document.getElementById('aligner-panel');
+            const img = document.querySelector('image.motor-img');
+            const sx = document.getElementById('motor-x');
+            const sy = document.getElementById('motor-y');
+            const sw = document.getElementById('motor-w');
+            const snapBtn = document.getElementById('align-snap');
+            const flowPath = document.getElementById('flow-line');
+            const motorGroup = document.getElementById('motor');
+
+            function applyValues(x,y,w){
+                if(!img) return;
+                img.setAttribute('x', String(x));
+                img.setAttribute('y', String(y));
+                img.setAttribute('width', String(w));
+                img.setAttribute('height', String(w));
+            }
+
+            // compute flow path last point (in svg user coords)
+            function getFlowEndPoint(){
+                if(!flowPath) return null;
+                const d = flowPath.getAttribute('d') || '';
+                // simple parse: take the last pair of numbers after the last command
+                // e.g. 'M 420 420 L 300 420 L 300 200 L 240 200' => last point is 240,200
+                const parts = d.trim().split(/[ ,]+/);
+                for(let i = parts.length - 1; i >= 0; i--){
+                    if(!isNaN(parseFloat(parts[i]))) continue;
+                }
+                // find last two numeric tokens
+                const nums = parts.filter(p => !isNaN(parseFloat(p))).map(Number);
+                if(nums.length < 2) return null;
+                const x = nums[nums.length - 2];
+                const y = nums[nums.length - 1];
+                return { x, y };
+            }
+
+            // snap image center to pipe endpoint
+            function snapToPipe(){
+                const pt = getFlowEndPoint();
+                if(!pt || !img || !motorGroup) return;
+
+                // motorGroup has transform translate(420, 420) in markup; compute group origin
+                const transform = motorGroup.getAttribute('transform') || '';
+                const m = transform.match(/translate\(([-0-9.]+)\s*,?\s*([-0-9.]+)\)/);
+                const gx = m ? Number(m[1]) : 0;
+                const gy = m ? Number(m[2]) : 0;
+
+                // the flow endpoint is absolute in SVG coords; we want to position the image so its center
+                // sits at that point, but the image x/y are relative to the motor group's origin.
+                const imgW = Number(sw.value) || Number(img.getAttribute('width')) || 90;
+                const imgH = imgW; // square image
+
+                // compute image x/y relative to group origin so that (gx + x + imgW/2, gy + y + imgH/2) == pt
+                const relX = pt.x - gx - imgW / 2;
+                const relY = pt.y - gy - imgH / 2;
+
+                // apply and update sliders
+                applyValues(Math.round(relX), Math.round(relY), Math.round(imgW));
+                sx.value = Math.round(relX);
+                sy.value = Math.round(relY);
+                sw.value = Math.round(imgW);
+            }
+
+            // load saved (with improved defaults)
+            const saved = JSON.parse(localStorage.getItem('motorAlign')||'{}');
+            sx.value = ('x' in saved) ? saved.x : -32;
+            sy.value = ('y' in saved) ? saved.y : -100;
+            sw.value = ('w' in saved) ? saved.w : 174;
+            applyValues(sx.value, sy.value, sw.value);
+            // initialize numeric readouts
+            if(typeof updateAndApply === 'function') updateAndApply();
+
+            const sxVal = document.getElementById('motor-x-val');
+            const syVal = document.getElementById('motor-y-val');
+            const swVal = document.getElementById('motor-w-val');
+
+            function updateAndApply(){
+                applyValues(sx.value, sy.value, sw.value);
+                if(sxVal) sxVal.textContent = sx.value;
+                if(syVal) syVal.textContent = sy.value;
+                if(swVal) swVal.textContent = sw.value;
+            }
+
+            sx.addEventListener('input', updateAndApply);
+            sy.addEventListener('input', updateAndApply);
+            sw.addEventListener('input', updateAndApply);
+
+            toggle.addEventListener('click', ()=>{ panel.style.display = panel.style.display === 'block' ? 'none' : 'block'; });
+            document.getElementById('align-save').addEventListener('click', ()=>{
+                localStorage.setItem('motorAlign', JSON.stringify({x: Number(sx.value), y: Number(sy.value), w: Number(sw.value)}));
+                panel.style.display = 'none';
+                setAlignStatus('Saved alignment', 'success');
+            });
+            document.getElementById('align-reset').addEventListener('click', ()=>{
+                sx.value = -32; sy.value = -100; sw.value = 174; applyValues(sx.value, sy.value, sw.value); updateAndApply(); localStorage.removeItem('motorAlign'); updateCodePreview();
+                setAlignStatus('Reset to defaults', '');
+            });
+
+            if(snapBtn) snapBtn.addEventListener('click', ()=>{
+                snapToPipe();
+                // persist snapped position as new default
+                localStorage.setItem('motorAlign', JSON.stringify({x: Number(sx.value), y: Number(sy.value), w: Number(sw.value)}));
+                updateAndApply();
+                showTemporaryNotice('Motor snapped and saved');
+                setAlignStatus('Snapped to pipe and saved', 'success');
+            });
+            // code preview element
+            const codeEl = document.getElementById('motor-code');
+            const alignStatusEl = document.getElementById('align-status');
+            function setAlignStatus(msg, tone){
+                if(!alignStatusEl) return;
+                alignStatusEl.textContent = msg || '';
+                alignStatusEl.style.color = tone === 'error' ? '#b91c1c' : (tone === 'success' ? '#065f46' : 'var(--text-muted)');
+            }
+            function updateCodePreview(){
+                const x = Number(sx.value), y = Number(sy.value), w = Number(sw.value);
+                const h = w;
+                const code = `<image href="motor.png" x="${x}" y="${y}" width="${w}" height="${h}" preserveAspectRatio="xMidYMid meet" class="motor-img"/>`;
+                if(codeEl) codeEl.value = code;
+            }
+            updateCodePreview();
+            // update preview whenever sliders change
+            sx.addEventListener('input', updateCodePreview);
+            sy.addEventListener('input', updateCodePreview);
+            sw.addEventListener('input', updateCodePreview);
+
+            // copy code to clipboard
+            const copyBtn = document.getElementById('copy-code');
+            if(copyBtn) copyBtn.addEventListener('click', ()=>{
+                const txt = codeEl ? codeEl.value : '';
+                if(!txt) return;
+                navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(txt) : (function(){
+                    const t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+                })();
+                showTemporaryNotice('Code copied to clipboard');
+            });
+
+            // apply code - parse x/y/width/height from the preview and apply
+            const applyBtn = document.getElementById('apply-code');
+            if(applyBtn) applyBtn.addEventListener('click', ()=>{
+                const txt = codeEl ? codeEl.value : '';
+                if(!txt) return showTemporaryNotice('No code to apply');
+                // simple regex parse
+                const m = txt.match(/x\s*=\s*"([-0-9.]+)"/);
+                const n = txt.match(/y\s*=\s*"([-0-9.]+)"/);
+                const w = txt.match(/width\s*=\s*"([-0-9.]+)"/);
+                const h = txt.match(/height\s*=\s*"([-0-9.]+)"/);
+                if(m && n && w && h){
+                    const nx = Number(m[1]), ny = Number(n[1]), nw = Number(w[1]);
+                    sx.value = nx; sy.value = ny; sw.value = nw; updateAndApply();
+                    localStorage.setItem('motorAlign', JSON.stringify({x: nx, y: ny, w: nw}));
+                    showTemporaryNotice('Coordinates applied and saved');
+                    setAlignStatus('Coordinates applied and saved', 'success');
+                } else {
+                    showTemporaryNotice('Could not parse coordinates from code');
+                    setAlignStatus('Could not parse coordinates. Ensure you have x, y and width attributes present.', 'error');
+                }
+            });
+        })();
+
+    // motor image graceful fallback handler
+    (function(){
+        const img = document.querySelector('image.motor-img');
+        const fallback = document.getElementById('motor-fallback');
+        if(!img || !fallback) return;
+
+        // SVG <image> elements don't consistently emit 'error' across browsers when local file is missing;
+        // attempt to load via an Image() object to detect failure, then toggle fallback.
+        const href = img.getAttribute('href') || img.getAttributeNS('http://www.w3.org/1999/xlink','href');
+        try{
+            const probe = new Image();
+            probe.onload = () => { fallback.style.display = 'none'; img.style.display = null; };
+            probe.onerror = () => { fallback.style.display = null; img.style.display = 'none'; };
+            probe.src = href;
+        }catch(e){
+            // show fallback if any error
+            fallback.style.display = null; img.style.display = 'none';
+        }
+    })();
+    </script>
+
+</body>
+</html>
